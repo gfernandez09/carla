@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Una sorpresa para Carla</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --ink: #0a0a0f;
+    --ink2: #12121a;
+    --smoke: rgba(255,255,255,0.06);
+    --muted: rgba(255,255,255,0.45);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: var(--ink);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    cursor: default;
+  }
+
+  /* ── CANVAS PARTICLES ── */
+  #canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  /* ── SCREEN 1: SURPRISE ── */
+  #screen-1 {
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+    margin-bottom: 28px;
+  }
+
+  .main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 8vw, 88px);
+    font-weight: 700;
+    line-height: 1.05;
+    opacity: 0;
+    animation: fadeUp 1.1s ease 0.6s forwards;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff 40%, var(--gold-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 1.1s ease 0.9s forwards;
+    margin-bottom: 56px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 1.1s ease 1.2s forwards;
+  }
+
+  .btn {
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    border: none;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-yes {
+    background: var(--gold);
+    color: #0a0a0f;
+    box-shadow: 0 0 40px rgba(201,168,76,0.35);
+  }
+  .btn-yes:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 0 60px rgba(201,168,76,0.55);
+    background: var(--gold-light);
+  }
+
+  .btn-no {
+    background: var(--smoke);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-no:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.1); }
+
+  /* ── DECORATIVE LINE ── */
+  .deco-line {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    margin: 0 auto 40px;
+    opacity: 0;
+    animation: fadeIn 1.5s ease 1.5s forwards;
+  }
+
+  /* ── SCREEN 2: EVENT ── */
+  #screen-2 {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    min-height: auto;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 32px;
+    opacity: 0;
+  }
+
+  .hero-band {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 10vw, 120px);
+    font-weight: 700;
+    line-height: 0.95;
+    margin-bottom: 8px;
+    opacity: 0;
+    background: linear-gradient(135deg, #fff 30%, var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-album {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(16px, 2.5vw, 24px);
+    color: var(--gold);
+    margin-bottom: 48px;
+    opacity: 0;
+  }
+
+  .hero-date-block {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 60px;
+    opacity: 0;
+  }
+
+  .divider-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .date-item {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+  }
+
+  .scroll-hint span {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .scroll-arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  /* ── ARTISTS SECTION ── */
+  .artists-section {
+    width: 100%;
+    padding: 100px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 60px;
+    text-align: center;
+  }
+
+  .artists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2px;
+  }
+
+  .artist-card {
+    background: var(--ink2);
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+  }
+
+  .artist-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .artist-card:hover { background: #16161f; }
+  .artist-card:hover::before { opacity: 1; }
+
+  .artist-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--gold-dim);
+    line-height: 1;
+    margin-bottom: 20px;
+    transition: color 0.4s;
+  }
+
+  .artist-card:hover .artist-number { color: rgba(201,168,76,0.25); }
+
+  .artist-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+
+  .artist-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── VENUE SECTION ── */
+  .venue-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 100px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  @media (max-width: 680px) {
+    /* Pantalla 1 */
+    .btn-row { flex-direction: column; align-items: center; }
+    .btn { width: 260px; text-align: center; }
+
+    /* Hero */
+    .hero { padding: 80px 24px 100px; min-height: 100svh; }
+    .hero-date-block {
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .divider-dot { width: 24px; height: 1px; border-radius: 0; }
+    .date-item { font-size: 12px; letter-spacing: 1.5px; }
+
+    /* Artists */
+    .artists-section { padding: 72px 16px; }
+    .section-label { margin-bottom: 36px; }
+    .artist-card { padding: 36px 24px; }
+    .artist-number { font-size: 48px; margin-bottom: 14px; }
+    .artist-name { font-size: 24px; }
+
+    /* Venue */
+    .venue-section {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 72px 24px;
+    }
+    .venue-stats { flex-direction: row; flex-wrap: wrap; gap: 20px; }
+    .stat-item { flex: 1; min-width: 80px; }
+    .stat-num { font-size: 32px; }
+
+    /* Tickets */
+    .ticket-section { padding: 72px 16px 100px; }
+    .tickets-intro { margin-bottom: 40px; }
+    .tickets-pair { flex-direction: column; align-items: center; gap: 32px; }
+    .bp { width: 100%; max-width: 360px; }
+    .bp:hover { transform: none; box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.3); }
+    .bp:last-child:hover { transform: none; }
+    .love-note { font-size: 14px; padding: 0 8px; }
+    .cta-btn { padding: 16px 36px; font-size: 13px; }
+  }
+
+  .venue-label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .venue-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .venue-detail {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .venue-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .stat-item { border-left: 1px solid rgba(201,168,76,0.3); padding-left: 24px; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── TICKET SECTION ── */
+  .ticket-section {
+    width: 100%;
+    padding: 100px 20px 140px;
+    text-align: center;
+  }
+
+  /* ── TICKETS BOARDING PASS ── */
+  .tickets-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .tickets-intro {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .tickets-intro-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .tickets-intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .tickets-intro-sub {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .tickets-pair {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* The boarding-pass card */
+  .bp {
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: visible;
+    position: relative;
+    color: #111;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.3);
+    transition: transform 0.4s cubic-bezier(.16,1,.3,1), box-shadow 0.4s;
+  }
+
+  .bp:hover {
+    transform: translateY(-8px) rotate(-0.5deg);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.5), 0 0 40px rgba(201,168,76,0.15);
+  }
+
+  .bp:last-child:hover { transform: translateY(-8px) rotate(0.5deg); }
+
+  /* Header strip */
+  .bp-header {
+    background: #0a0a0f;
+    padding: 20px 24px 18px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bp-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .bp-header-date {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 3px;
+  }
+
+  .bp-badge {
+    background: var(--gold);
+    color: #0a0a0f;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* Body */
+  .bp-body {
+    padding: 20px 24px 0;
+  }
+
+  .bp-location {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .bp-location-icon {
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+    opacity: 0.4;
+  }
+
+  .bp-location-text {
+    font-size: 12px;
+    color: #444;
+    line-height: 1.5;
+  }
+
+  /* Seat grid */
+  .bp-seat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+
+  .bp-seat-cell {
+    padding: 14px 12px;
+    border-right: 1px solid #e8e8e8;
+    text-align: center;
+  }
+
+  .bp-seat-cell:last-child { border-right: none; }
+
+  .bp-seat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #0a0a0f;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .bp-seat-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .bp-seat-cell.wide .bp-seat-num {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+
+  /* Tipo entrada */
+  .bp-type {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0 0;
+    margin: 0 0 0;
+  }
+
+  .bp-type-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 3px;
+  }
+
+  .bp-type-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+  }
+
+  /* Tear line */
+  .bp-tear {
+    display: flex;
+    align-items: center;
+    margin: 16px 0 0;
+    position: relative;
+  }
+
+  .bp-tear-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    flex-shrink: 0;
+  }
+
+  .bp-tear-line {
+    flex: 1;
+    border-top: 2px dashed #ddd;
+    margin: 0 4px;
+  }
+
+  /* Stub */
+  .bp-stub {
+    padding: 14px 24px 20px;
+    background: #fafafa;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bp-stub-info { }
+
+  .bp-stub-event {
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.3px;
+  }
+
+  .bp-stub-sub {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* Barcode */
+  .bp-barcode {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 32px;
+  }
+
+  .bp-barcode span {
+    display: block;
+    width: 2px;
+    background: #222;
+    border-radius: 1px;
+  }
+
+  /* Owner tag */
+  .bp-owner {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: #0a0a0f;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .love-note {
+    margin-top: 56px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  .love-note strong {
+    color: var(--gold);
+    font-style: normal;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    margin-top: 48px;
+    padding: 18px 52px;
+    background: var(--gold);
+    color: #0a0a0f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 50px;
+    text-decoration: none;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 40px rgba(201,168,76,0.3);
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 60px rgba(201,168,76,0.5);
+  }
+
+
+
+  /* ── FOOTER ── */
+  .footer {
+    padding: 40px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.15); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger delays for artist cards */
+  .artist-card:nth-child(1) { transition-delay: 0s; }
+  .artist-card:nth-child(2) { transition-delay: 0.12s; }
+  .artist-card:nth-child(3) { transition-delay: 0.24s; }
+
+  /* ── NO BUTTON WIGGLE ── */
+  @keyframes wiggle {
+    0%,100%{transform:translate(0)}
+    20%{transform:translate(-8px,-5px)}
+    40%{transform:translate(10px,-8px)}
+    60%{transform:translate(-6px,4px)}
+    80%{transform:translate(9px,6px)}
+  }
+
+  /* ── TRANSITION OVERLAY ── */
+  #transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+
+  #transition-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .transition-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 56px);
+    color: var(--gold);
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.6s cubic-bezier(.16,1,.3,1);
+  }
+
+  #transition-overlay.active .transition-text {
+    opacity: 1;
+    transform: scale(1);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="transition-overlay"><div class="transition-text">Sabía que dirías que sí ✨</div></div>
+
+<!-- ── SCREEN 1 ── -->
+<section id="screen-1">
+  <p class="eyebrow">Para Carla, con todo mi amor</p>
+  <div class="deco-line"></div>
+  <h1 class="main-title">Una sorpresa<br>te espera.</h1>
+  <p class="subtitle">He estado guardando algo especial para ti. Algo que sé que te va a volar la cabeza. ¿Estás lista para descubrirlo?</p>
+  <div class="btn-row">
+    <button class="btn btn-yes" id="btn-yes">Sí, quiero saber 🔥</button>
+    <button class="btn btn-no" id="btn-no">No...</button>
+  </div>
+</section>
+
+<!-- ── SCREEN 2 ── -->
+<div id="screen-2">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-eyebrow reveal">Gira España 2026 · Granada</p>
+    <h1 class="hero-band reveal">Hijos de<br>la Ruina</h1>
+    <p class="hero-album reveal">Vol. 4 — El regreso definitivo</p>
+    <div class="hero-date-block reveal">
+      <span class="date-item">26 Sep 2026</span>
+      <div class="divider-dot"></div>
+      <span class="date-item">21:00 h</span>
+      <div class="divider-dot"></div>
+      <span class="date-item">Plaza de Toros · Granada</span>
+    </div>
+    <div class="scroll-hint reveal">
+      <span>Descubre más</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+
+  <!-- ARTISTS -->
+  <div class="artists-section">
+    <p class="section-label reveal">Los tres</p>
+    <div class="artists-grid">
+      <div class="artist-card reveal">
+        <div class="artist-number">01</div>
+        <div class="artist-name">Natos</div>
+        <p class="artist-desc">La voz de la calle. Uno de los MCs más respetados del rap en español. Rimas que cortan y verdades que duelen.</p>
+      </div>
+      <div class="artist-card reveal">
+        <div class="artist-number">02</div>
+        <div class="artist-name">Waor</div>
+        <p class="artist-desc">Flow imparable y letras que te golpean directo al pecho. La otra mitad del dúo legendario Natos & Waor.</p>
+      </div>
+      <div class="artist-card reveal">
+        <div class="artist-number">03</div>
+        <div class="artist-name">Recycled J</div>
+        <p class="artist-desc">El tercero en discordia. Jorge Escorial aporta melodía, calle y una presencia en directo que electriza cualquier escenario.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENUE -->
+  <div class="venue-section">
+    <div class="reveal">
+      <p class="venue-label">El escenario</p>
+      <h2 class="venue-name">Plaza de Toros de Granada</h2>
+      <p class="venue-detail">
+        Uno de los recintos más emblemáticos de Andalucía. Una noche de hip-hop bajo el cielo abierto de Granada, con más de dos horas de espectáculo, pantallas LED de gran formato y una puesta en escena que nunca habías visto.
+        <br><br>
+        Av. Dr. Olóriz, 25 · Granada
+      </p>
+    </div>
+    <div class="venue-stats reveal">
+      <div class="stat-item">
+        <div class="stat-num">+2h</div>
+        <div class="stat-label">De show sin parar</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Artistas en escena</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">13</div>
+        <div class="stat-label">Años de ruina juntos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TICKET SECTION -->
+  <div class="ticket-section">
+    <div class="tickets-wrapper reveal">
+
+      <div class="tickets-intro">
+        <p class="tickets-intro-eyebrow">Nuestras entradas</p>
+        <h2 class="tickets-intro-title">Tú y yo, Carla.</h2>
+        <p class="tickets-intro-sub">Asientos juntos. Una noche que no vamos a olvidar.</p>
+      </div>
+
+      <div class="tickets-pair">
+
+        <!-- ENTRADA 1 — Carla -->
+        <div class="bp">
+          <div class="bp-owner">Carla ✨</div>
+          <div class="bp-header">
+            <div>
+              <div class="bp-header-title">Hijos de la Ruina<br>Tour</div>
+              <div class="bp-header-date">Sáb · 26/09/2026 · 21:00</div>
+            </div>
+            <div class="bp-badge">Asiento<br>Reservado</div>
+          </div>
+          <div class="bp-body">
+            <div class="bp-location">
+              <svg class="bp-location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <div class="bp-location-text">Plaza de Toros de Granada<br>Av. Dr. Olóriz, 25 · Granada</div>
+            </div>
+            <div class="bp-seat-grid">
+              <div class="bp-seat-cell">
+                <div class="bp-seat-num">17</div>
+                <div class="bp-seat-label">Fila</div>
+              </div>
+              <div class="bp-seat-cell">
+                <div class="bp-seat-num">18</div>
+                <div class="bp-seat-label">Asiento</div>
+              </div>
+              <div class="bp-seat-cell wide">
+                <div class="bp-seat-num">Sector 1,<br>Tendido</div>
+                <div class="bp-seat-label">Bloque</div>
+              </div>
+            </div>
+            <div class="bp-type">
+              <div>
+                <div class="bp-type-label">Zona</div>
+                <div class="bp-type-val">Grada PL1</div>
+              </div>
+              <div style="text-align:right">
+                <div class="bp-type-label">Pedido</div>
+                <div class="bp-type-val" style="font-size:11px;color:#888">1634074762</div>
+              </div>
+            </div>
+          </div>
+          <div class="bp-tear">
+            <div class="bp-tear-circle"></div>
+            <div class="bp-tear-line"></div>
+            <div class="bp-tear-circle"></div>
+          </div>
+          <div class="bp-stub">
+            <div class="bp-stub-info">
+              <div class="bp-stub-event">Hijos de la Ruina Tour</div>
+              <div class="bp-stub-sub">Granada · Fila 17 · Asiento 18</div>
+            </div>
+            <div class="bp-barcode" id="bc1"></div>
+          </div>
+        </div>
+
+        <!-- ENTRADA 2 — Tú -->
+        <div class="bp">
+          <div class="bp-owner">Tu marido ❤️</div>
+          <div class="bp-header">
+            <div>
+              <div class="bp-header-title">Hijos de la Ruina<br>Tour</div>
+              <div class="bp-header-date">Sáb · 26/09/2026 · 21:00</div>
+            </div>
+            <div class="bp-badge">Asiento<br>Reservado</div>
+          </div>
+          <div class="bp-body">
+            <div class="bp-location">
+              <svg class="bp-location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <div class="bp-location-text">Plaza de Toros de Granada<br>Av. Dr. Olóriz, 25 · Granada</div>
+            </div>
+            <div class="bp-seat-grid">
+              <div class="bp-seat-cell">
+                <div class="bp-seat-num">17</div>
+                <div class="bp-seat-label">Fila</div>
+              </div>
+              <div class="bp-seat-cell">
+                <div class="bp-seat-num">17</div>
+                <div class="bp-seat-label">Asiento</div>
+              </div>
+              <div class="bp-seat-cell wide">
+                <div class="bp-seat-num">Sector 1,<br>Tendido</div>
+                <div class="bp-seat-label">Bloque</div>
+              </div>
+            </div>
+            <div class="bp-type">
+              <div>
+                <div class="bp-type-label">Zona</div>
+                <div class="bp-type-val">Grada PL1</div>
+              </div>
+              <div style="text-align:right">
+                <div class="bp-type-label">Pedido</div>
+                <div class="bp-type-val" style="font-size:11px;color:#888">1634074762</div>
+              </div>
+            </div>
+          </div>
+          <div class="bp-tear">
+            <div class="bp-tear-circle"></div>
+            <div class="bp-tear-line"></div>
+            <div class="bp-tear-circle"></div>
+          </div>
+          <div class="bp-stub">
+            <div class="bp-stub-info">
+              <div class="bp-stub-event">Hijos de la Ruina Tour</div>
+              <div class="bp-stub-sub">Granada · Fila 17 · Asiento 17</div>
+            </div>
+            <div class="bp-barcode" id="bc2"></div>
+          </div>
+        </div>
+
+      </div><!-- /tickets-pair -->
+
+      <p class="love-note">
+        Porque llevas meses cantando sus canciones en el coche<br>
+        y el 26 de septiembre los cantamos juntos.<br><br>
+        Te quiero, <strong>Carla</strong>.
+      </p>
+
+    </div><!-- /tickets-wrapper -->
+  </div>
+
+  <footer class="footer">
+    Hijos de la Ruina · Granada · 26.09.2026
+  </footer>
+</div>
+
+<script>
+// ── BARCODES ──
+function genBarcode(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const heights = [32,20,28,16,32,24,18,30,22,32,14,28,20,32,18,26,32,16,24,30,18,32,22,28];
+  heights.forEach(h => {
+    const bar = document.createElement('span');
+    bar.style.height = h + 'px';
+    el.appendChild(bar);
+  });
+}
+genBarcode('bc1');
+genBarcode('bc2');
+
+// ── PARTICLE CANVAS ──
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function createParticle() {
+  return {
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: -Math.random() * 0.4 - 0.1,
+    alpha: Math.random() * 0.5 + 0.1,
+    life: Math.random()
+  };
+}
+
+for (let i = 0; i < 120; i++) particles.push(createParticle());
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life += 0.003;
+    const a = p.alpha * Math.sin(p.life * Math.PI);
+    if (a <= 0 || p.y < -10) { particles[i] = createParticle(); particles[i].y = H + 10; return; }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(201,168,76,${a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── NO BUTTON RUNS AWAY (solo en desktop) ──
+const btnNo = document.getElementById('btn-no');
+let noClicks = 0;
+const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+
+btnNo.addEventListener('mouseenter', () => {
+  if (isTouchDevice()) return;
+  noClicks++;
+  const vw = window.innerWidth - btnNo.offsetWidth - 20;
+  const vh = window.innerHeight - btnNo.offsetHeight - 20;
+  btnNo.style.position = 'fixed';
+  btnNo.style.left = Math.max(10, Math.floor(Math.random() * vw)) + 'px';
+  btnNo.style.top = Math.max(10, Math.floor(Math.random() * vh)) + 'px';
+  btnNo.style.zIndex = '999';
+  btnNo.style.transition = 'left 0.3s cubic-bezier(.34,1.56,.64,1), top 0.3s cubic-bezier(.34,1.56,.64,1)';
+  if (noClicks === 3) btnNo.style.opacity = '0.5';
+  if (noClicks >= 5) { btnNo.style.opacity = '0'; btnNo.style.pointerEvents = 'none'; }
+});
+
+// En móvil: al tocar "No" se encoge y desaparece
+btnNo.addEventListener('click', () => {
+  if (!isTouchDevice()) return;
+  noClicks++;
+  btnNo.style.transition = 'transform 0.3s, opacity 0.3s';
+  btnNo.style.transform = 'scale(0.85)';
+  btnNo.style.opacity = String(Math.max(0, 1 - noClicks * 0.25));
+  if (noClicks >= 4) { btnNo.style.opacity = '0'; btnNo.style.pointerEvents = 'none'; }
+  setTimeout(() => { if (noClicks < 4) btnNo.style.transform = 'scale(1)'; }, 300);
+});
+
+// ── YES BUTTON ──
+document.getElementById('btn-yes').addEventListener('click', () => {
+  const overlay = document.getElementById('transition-overlay');
+  overlay.classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('screen-1').style.display = 'none';
+    document.getElementById('screen-2').style.display = 'flex';
+    document.getElementById('screen-2').style.flexDirection = 'column';
+    window.scrollTo(0, 0);
+
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      triggerReveal();
+    }, 600);
+  }, 900);
+});
+
+// ── SCROLL REVEAL ──
+function triggerReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  els.forEach(el => io.observe(el));
+  // Trigger the first ones immediately
+  setTimeout(() => {
+    document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('visible'));
+  }, 100);
+}
+</script>
+</body>
+</html>
